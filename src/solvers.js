@@ -60,38 +60,45 @@ window.findNRooksSolution = function(n) {
     return pieceCount;
   };
     
-  var decisionTree = function(level, board) {
+  var decisionTree = function(board, level) {
     var trees = [];
     for (let colIndex = 0; colIndex < n; colIndex++) {
       //add new piece
-      debugger;
-      board.togglePiece(level, colIndex);
-      console.log(board.rows());
-      //see if there are conflicts, if so, take the piece off
-      if (board.hasAnyRowConflicts() || board.hasAnyColConflicts()) {
-        board.togglePiece(level, colIndex);
-      } else {
-      //if not, add a new decision tree for all possibilities afterwards
-        if (countPieces(board) === n) {
-          solutions.push(board.rows());
-        } else {
-          var rook = new Tree([level, colIndex], board);
-          //if not at the bottom of the board 
-          //for loop depth
-          // rook.addChild(decisionTree(level + 1));
-          console.log(rook);
-          rook.addChildren(decisionTree(level + 1, rook.board));
-          //for (let i = 0; i < )rook.children 
-          trees.push(rook);
-        }
-      }
+      decide(colIndex, board, level);
     }
     return trees;
   };  
   
+  var decide = function(colIndex, board, level) {
+    if (level === undefined) {
+      noLevel = true;
+    } 
+    var level = level || 0;
+    board.togglePiece(level, colIndex);
+    //see if there are conflicts, if so, take the piece off
+    if (board.hasAnyRowConflicts() || board.hasAnyColConflicts()) {
+      board.togglePiece(level, colIndex);
+    } else {
+    //if not, add a new decision tree for all possibilities afterwards
+      if (countPieces(board) === n) {
+        solutions.push(board.rows());
+      } else {
+        var rook = new Tree([level, colIndex], board);
+        //if not at the bottom of the board 
+        //for loop depth
+        // rook.addChild(decisionTree(level + 1));
+        rook.addChildren(decisionTree(rook.board, level + 1));
+        //for (let i = 0; i < )rook.children 
+        if (!noLevel) {
+          trees.push(rook);
+        }
+      }
+    }
+  };
+  
   for (var i = 0; i < n; i++) {
     var board = new Board({n: n});
-    decisionTree(i, board); 
+    decide(i, board); 
   }
   
   solution = solutions[0];
@@ -103,10 +110,64 @@ window.findNRooksSolution = function(n) {
 
 // return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
-  var solutionCount = undefined; //fixme
   
+  var solutions = [];
+  solutionCount = undefined;
+    
+  var countPieces = function() {
+    var pieceCount = 0;
+    board.rows().forEach(element => pieceCount += (element.reduce((sum, value)=> sum + value) ));
+    return pieceCount;
+  };
+    
+  var decisionTree = function(board, level) {
+    var trees = [];
+    for (let colIndex = 0; colIndex < n; colIndex++) {
+      //add new piece
+      decide(colIndex, board, level);
+    }
+    return trees;
+  };  
   
-
+  var decide = function(colIndex, board, level) {
+    
+    if (level === undefined) {
+      topLevel = true;
+    } 
+    var level = level || 0;
+    board.togglePiece(level, colIndex);
+    //see if there are conflicts, if so, take the piece off
+    if (board.hasAnyRowConflicts() || board.hasAnyColConflicts()) {
+      board.togglePiece(level, colIndex);
+    } else {
+    //if not, add a new decision tree for all possibilities afterwards
+      if (countPieces(board) === n) {
+        solutions.push(board.rows());
+      } 
+      
+      if (level < n - 1) {
+        var rook = new Tree([level, colIndex], board);
+        //if not at the bottom of the board 
+        //for loop depth
+        // rook.addChild(decisionTree(level + 1));
+        rook.addChildren(decisionTree(rook.board, level + 1));
+        //for (let i = 0; i < )rook.children 
+        if (!topLevel) {
+          trees.push(rook);
+        }
+      }
+      board.togglePiece(level, colIndex);
+    }
+  };
+  
+  for (var i = 0; i < n; i++) {
+    var board = new Board({n: n});
+    decide(i, board); 
+  }
+  
+  console.log(solutions);
+  solutionCount = solutions.length;
+  
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
   return solutionCount;
 };
