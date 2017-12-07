@@ -93,7 +93,6 @@
       }
     
       return isConflict;
-      
     },
 
 
@@ -186,7 +185,6 @@
         for (let i = 0; colIndex - i >= 0; i++) {
           sum += this.get(i)[colIndex - i];
         }
-        console.log(sum);
       }
       
       if (colIndex > n - 1) {
