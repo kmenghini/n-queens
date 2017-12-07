@@ -82,20 +82,11 @@
       var rowSum = this.get(rowIndex).reduce((sum, value)=>sum + value);
       return rowSum > 1;
     },
-
-    // test if any rows on this board contain conflicts
+    
     hasAnyRowConflicts: function() {
-      // this.attributes
-      // for (let key in this.attributes) {
-      //   console.log(Board);
-      //   if (Board.prototype.hasRowConflictAt.call(this, key)) {
-      //     return true; 
-      //   }
-      // }
       let isConflict = false;
-      let n = this.attributes.n;
       
-      for (let i = 0; i < n; i++) {
+      for (let i = 0; i < this.attributes.n; i++) {
         if (this.hasRowConflictAt(i)) {
           isConflict = true;
         } 
@@ -112,12 +103,28 @@
     //
     // test if a specific column on this board contains a conflict
     hasColConflictAt: function(colIndex) {
-      return false; // fixme
+      //get all rows @ columnindex
+      //sum same index in each row
+      var sum = 0;
+      
+      for (let i = 0; i < this.attributes.n; i++) {
+        sum += this.get(i)[colIndex];
+      }
+      
+      return sum > 1; // fixme
     },
 
     // test if any columns on this board contain conflicts
     hasAnyColConflicts: function() {
-      return false; // fixme
+      let isConflict = false;
+      
+      for (let i = 0; i < this.attributes.n; i++) {
+        if (this.hasColConflictAt(i)) {
+          isConflict = true;
+        } 
+      }
+      
+      return isConflict; // fixme
     },
 
 
@@ -127,12 +134,39 @@
     //
     // test if a specific major diagonal on this board contains a conflict
     hasMajorDiagonalConflictAt: function(majorDiagonalColumnIndexAtFirstRow) {
-      return false; // fixme
+      let sum = 0;
+      let colIndex = majorDiagonalColumnIndexAtFirstRow;
+      
+      //if diag starts at top (positive index)
+      if (colIndex >= 0) {
+        for (let i = 0; colIndex + i < this.attributes.n; i++) {
+          sum += this.get(i)[colIndex + i];
+        }  
+      }
+      
+      //if diag starts from side (neg index)
+      if (colIndex < 0) {
+        var rowIndex = -colIndex;
+        for (let i = 0; rowIndex + i < this.attributes.n; i++) {
+          sum += this.get(rowIndex + i)[i];
+        }
+      }
+      
+      return sum > 1; // fixme
     },
 
     // test if any major diagonals on this board contain conflicts
     hasAnyMajorDiagonalConflicts: function() {
-      return false; // fixme
+      let bottomLeftCornerIndex = -(this.attributes.n - 1);
+      let isConflict = false;
+      
+      for ( let i = bottomLeftCornerIndex; i < this.attributes.n; i++) {
+        if (this.hasMajorDiagonalConflictAt(i)) {
+          isConflict = true; 
+        }
+      }
+      
+      return isConflict; // fixme
     },
 
 
@@ -142,12 +176,47 @@
     //
     // test if a specific minor diagonal on this board contains a conflict
     hasMinorDiagonalConflictAt: function(minorDiagonalColumnIndexAtFirstRow) {
-      return false; // fixme
+      
+      let sum = 0;
+      
+      let colIndex = minorDiagonalColumnIndexAtFirstRow;
+      var n = this.attributes.n;
+      
+      if (colIndex <= n - 1) {
+        for (let i = 0; colIndex - i >= 0; i++) {
+          sum += this.get(i)[colIndex - i];
+        }
+        console.log(sum);
+      }
+      
+      if (colIndex > n - 1) {
+        for (let i = 0; colIndex - (n - 1) + i <= (n - 1); i++) {
+          sum += this.get(colIndex - (n - 1) + i)[n - 1 - i];
+        }
+      }
+          
+      return sum > 1; // fixme
     },
 
     // test if any minor diagonals on this board contain conflicts
     hasAnyMinorDiagonalConflicts: function() {
-      return false; // fixme
+      //       let bottomLeftCornerIndex = -(this.attributes.n - 1);
+      // let isConflict = false;
+      
+      // for ( let i = bottomLeftCornerIndex; i < this.attributes.n; i++) {
+      //   if (this.hasMajorDiagonalConflictAt(i)) {
+      //     isConflict = true; 
+      //   }
+      // }
+      
+      // return isConflict; // fixme
+      let isConflict = false;
+      for (let i = 0; i <= (this.attributes.n - 1) * 2; i++) {
+        if (this.hasMinorDiagonalConflictAt(i)) {
+          isConflict = true;
+        }
+      }
+      return isConflict; // fixme
     }
 
     /*--------------------  End of Helper Functions  ---------------------*/
