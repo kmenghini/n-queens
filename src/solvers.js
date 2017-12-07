@@ -16,26 +16,85 @@
 //colSkip array (for dead columns)
 //rowSkip array (for dead rows)
 //if row in rowSkip or col in colSkip --> current row /col ++ 
+window.Tree = function(coords, board, n) {
+  this.coords = coords;
+  // this.blocked = null;
+  this.children = [];
+  this.board = board;
+};
+
+Tree.prototype.addChild = function(value) {
+  this.children.push(new Tree(value));
+  return this.children[this.children.length - 1];
+};
+
+Tree.prototype.addChildren = function(array) {
+  this.children = array;
+};
 
 window.findNRooksSolution = function(n) {
+  
   var solution = undefined; 
+  var solutions = [];
   
-  const board = new Board({n: n});
-  
-  board.togglePiece(0, 0);
+  // board.togglePiece(0, 0);
   
   // colIndex++;
-  //on row 1, col 0
-  for (let rowIndex = 1; rowIndex < n; rowIndex++) {
+  // //on row 1, col 0
+  // for (let rowIndex = 0; rowIndex < n; rowIndex++) {
+  //   for (let colIndex = 0; colIndex < n; colIndex++) {
+  //     var instance = new Tree([rowIndex, colIndex]);
+  //     instance.blocked = rowIndex;
+  //     const board = new Board({n: n});
+  //     board.togglePiece(instance.coords[0], instance.coords[1]);
+      
+  //     if (board.hasAnyRowConflicts() || board.hasAnyColConflicts()) {
+  //       board.togglePiece(rowIndex, colIndex);
+  //     }
+  //   }
+  // }
+    
+  var countPieces = function() {
+    var pieceCount = 0;
+    board.rows().forEach(element => pieceCount += (element.reduce((sum, value)=> sum + value) ));
+    return pieceCount;
+  };
+    
+  var decisionTree = function(level, board) {
+    var trees = [];
     for (let colIndex = 0; colIndex < n; colIndex++) {
-      board.togglePiece(rowIndex, colIndex);
+      //add new piece
+      debugger;
+      board.togglePiece(level, colIndex);
+      console.log(board.rows());
+      //see if there are conflicts, if so, take the piece off
       if (board.hasAnyRowConflicts() || board.hasAnyColConflicts()) {
-        board.togglePiece(rowIndex, colIndex);
+        board.togglePiece(level, colIndex);
+      } else {
+      //if not, add a new decision tree for all possibilities afterwards
+        if (countPieces(board) === n) {
+          solutions.push(board.rows());
+        } else {
+          var rook = new Tree([level, colIndex], board);
+          //if not at the bottom of the board 
+          //for loop depth
+          // rook.addChild(decisionTree(level + 1));
+          console.log(rook);
+          rook.addChildren(decisionTree(level + 1, rook.board));
+          //for (let i = 0; i < )rook.children 
+          trees.push(rook);
+        }
       }
     }
+    return trees;
+  };  
+  
+  for (var i = 0; i < n; i++) {
+    var board = new Board({n: n});
+    decisionTree(i, board); 
   }
   
-  solution = board.rows();
+  solution = solutions[0];
   
   console.log('Single solution for ' + n + ' rooks:', JSON.stringify(solution));
   
@@ -54,7 +113,7 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = undefined;
+  var solution = [];
   
   if (n === 0) {
     return [];
@@ -75,10 +134,9 @@ window.findNQueensSolution = function(n) {
     board.rows().forEach(element => pieceCount += (element.reduce((sum, value)=> sum + value) ));
     if (pieceCount === n) {
       solution = board.rows();
-      break;
     }
   } 
-
+  
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
   
   return solution;

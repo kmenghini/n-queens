@@ -151,7 +151,7 @@
         }
       }
       
-      return sum > 1; // fixme
+      return sum > 1;
     },
 
     // test if any major diagonals on this board contain conflicts
