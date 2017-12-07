@@ -174,38 +174,149 @@ window.countNRooksSolutions = function(n) {
 
 // return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
-  var solution = [];
-  
-  if (n === 0) {
-    return [];
-  }
-  
-  for (let i = 0; i < n; i++) {
-    let board = new Board({n: n});
-    board.togglePiece(0, i); 
-    for (let rowIndex = 1; rowIndex < n; rowIndex++) {
-      for (let colIndex = 0; colIndex < n; colIndex++) {
-        board.togglePiece(rowIndex, colIndex);
-        if (board.hasAnyRowConflicts() || board.hasAnyColConflicts() || board.hasAnyMajorDiagonalConflicts() || board.hasAnyMinorDiagonalConflicts()) {
-          board.togglePiece(rowIndex, colIndex);
-        }
-      }
-    }
+
+  var solutions = [];
+  solutionCount = undefined;
+
+    
+  var countPieces = function() {
     var pieceCount = 0;
     board.rows().forEach(element => pieceCount += (element.reduce((sum, value)=> sum + value) ));
-    if (pieceCount === n) {
-      solution = board.rows();
+    return pieceCount;
+  };
+    
+  var decisionTree = function(board, level) {
+    var trees = [];
+    for (let colIndex = 0; colIndex < n; colIndex++) {
+      //add new piece
+      decide(colIndex, board, level);
     }
-  } 
+    return trees;
+  };  
   
-  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solution));
+  var decide = function(colIndex, board, level) {
+    
+    if (level === undefined) {
+      topLevel = true;
+    } 
+    var level = level || 0;
+    board.togglePiece(level, colIndex);
+    //see if there are conflicts, if so, take the piece off
+    if (board.hasAnyRowConflicts() || board.hasAnyColConflicts() || board.hasAnyMajorDiagonalConflicts() || board.hasAnyMinorDiagonalConflicts()) {
+      board.togglePiece(level, colIndex);
+    } else {
+    //if not, add a new decision tree for all possibilities afterwards
+      if (countPieces(board) === n) {
+        solutions.push(JSON.parse(JSON.stringify(board.rows())));
+      } 
+      
+      if (level < n - 1) {
+        var rook = new Tree([level, colIndex], board);
+        //if not at the bottom of the board 
+        //for loop depth
+        // rook.addChild(decisionTree(level + 1));
+        rook.addChildren(decisionTree(rook.board, level + 1));
+        //for (let i = 0; i < )rook.children 
+        if (!topLevel) {
+          trees.push(rook);
+        }
+      }
+      board.togglePiece(level, colIndex);
+    }
+  };
   
-  return solution;
+  for (var i = 0; i < n; i++) {
+    var board = new Board({n: n});
+    decide(i, board); 
+  }
+  
+//debugger;
+  
+  if (solutions.length === 0) {
+    var board = new Board({n: n});
+    solutions.push(board.rows());
+  }
+
+  if (n === 0) {
+    solutions = [[]];
+  }
+
+  console.log(solutions);
+  
+  console.log('Single solution for ' + n + ' queens:', JSON.stringify(solutions[0]));
+  
+  return solutions[0];
 };
 
 // return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {
-  var solutionCount = undefined; //fixme
+
+  var solutions = [];
+  solutionCount = undefined;
+    
+  var countPieces = function() {
+    var pieceCount = 0;
+    board.rows().forEach(element => pieceCount += (element.reduce((sum, value)=> sum + value) ));
+    return pieceCount;
+  };
+    
+  var decisionTree = function(board, level) {
+    var trees = [];
+    for (let colIndex = 0; colIndex < n; colIndex++) {
+      //add new piece
+      decide(colIndex, board, level);
+    }
+    return trees;
+  };  
+  
+  var decide = function(colIndex, board, level) {
+    
+    if (level === undefined) {
+      topLevel = true;
+    } 
+    var level = level || 0;
+    board.togglePiece(level, colIndex);
+    //see if there are conflicts, if so, take the piece off
+    if (board.hasAnyRowConflicts() || board.hasAnyColConflicts() || board.hasAnyMajorDiagonalConflicts() || board.hasAnyMinorDiagonalConflicts()) {
+      board.togglePiece(level, colIndex);
+    } else {
+    //if not, add a new decision tree for all possibilities afterwards
+      if (countPieces(board) === n) {
+        solutions.push(JSON.parse(JSON.stringify(board.rows())));
+      } 
+      
+      if (level < n - 1) {
+        var rook = new Tree([level, colIndex], board);
+        //if not at the bottom of the board 
+        //for loop depth
+        // rook.addChild(decisionTree(level + 1));
+        rook.addChildren(decisionTree(rook.board, level + 1));
+        //for (let i = 0; i < )rook.children 
+        if (!topLevel) {
+          trees.push(rook);
+        }
+      }
+      board.togglePiece(level, colIndex);
+    }
+  };
+    
+  for (var i = 0; i < n; i++) {
+    var board = new Board({n: n});
+    decide(i, board); 
+  }
+  
+//debugger;
+  
+  if (solutions.length === 0) {
+    var board = new Board({n: n});
+    solutions.push(board.rows());
+  }
+
+  if (n === 0) {
+    solutions = [[]];
+  }
+
+  solutionCount = solutions.length;
 
   console.log('Number of solutions for ' + n + ' queens:', solutionCount);
   return solutionCount;
