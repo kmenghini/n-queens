@@ -50,7 +50,7 @@ window.findNSolutions = function(n, type, findOne) {
         
       } 
       
-      if (level < n - 1) {
+      if (solutions.length < 1 || (!findOne && level < n - 1)) {
         var rook = new Tree();
         rook.addChildren(decisionTree(board, level + 1));
         
