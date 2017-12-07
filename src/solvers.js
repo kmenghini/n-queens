@@ -16,12 +16,15 @@ Tree.prototype.addChildren = function(array) {
 
 window.findNSolutions = function(n, type, findOne) {
   
+  if (n === 0) {
+    return [[]];
+  }
+  
   var solutions = [];
     
   var decisionTree = function(board, level) {
     var trees = [];
     for (let colIndex = 0; colIndex < n; colIndex++) {
-      //add new piece
       decide(colIndex, board, level);
     }
     return trees;
@@ -67,11 +70,7 @@ window.findNSolutions = function(n, type, findOne) {
   for (var i = 0; i < n; i++) {
     decide(i, board); 
   }
-
-  if (n === 0) {
-    solutions = [[]];
-  }
-  
+ 
   return solutions;
 };
 
@@ -81,7 +80,6 @@ window.findNRooksSolution = function(n) {
   return solutions[0];
 };
 
-// return the number of nxn chessboards that exist, with n rooks placed such that none of them can attack each other
 window.countNRooksSolutions = function(n) {
   var solutions = findNSolutions(n, 'rook');
   var solutionCount = solutions.length;
@@ -89,21 +87,16 @@ window.countNRooksSolutions = function(n) {
   return solutionCount;
 };
 
-// return a matrix (an array of arrays) representing a single nxn chessboard, with n queens placed such that none of them can attack each other
 window.findNQueensSolution = function(n) {
   var solutions = findNSolutions(n, 'queen', true);
-  
   if (solutions.length === 0) {
     var board = new Board({n: n});
     solutions.push(board.rows());
   }
-
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solutions[0]));
-  
   return solutions[0];
 };
 
-// return the number of nxn chessboards that exist, with n queens placed such that none of them can attack each other
 window.countNQueensSolutions = function(n) {  
   var solutions = findNSolutions(n, 'queen');
   var solutionCount = solutions.length;
