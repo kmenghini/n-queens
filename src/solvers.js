@@ -165,7 +165,6 @@ window.countNRooksSolutions = function(n) {
     decide(i, board); 
   }
   
-  console.log(solutions);
   solutionCount = solutions.length;
   
   console.log('Number of solutions for ' + n + ' rooks:', solutionCount);
@@ -241,7 +240,6 @@ window.findNQueensSolution = function(n) {
     solutions = [[]];
   }
 
-  console.log(solutions);
   
   console.log('Single solution for ' + n + ' queens:', JSON.stringify(solutions[0]));
   
@@ -307,10 +305,10 @@ window.countNQueensSolutions = function(n) {
   
 //debugger;
   
-  if (solutions.length === 0) {
-    var board = new Board({n: n});
-    solutions.push(board.rows());
-  }
+  // if (solutions.length === 0) {
+  //   var board = new Board({n: n});
+  //   solutions.push(board.rows());
+  // }
 
   if (n === 0) {
     solutions = [[]];
